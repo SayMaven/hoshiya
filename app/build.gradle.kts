@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hoshiya.app"
+    namespace = "com.saymaven.hoshiya"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.hoshiya.app"
+        applicationId = "com.saymaven.hoshiya"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -43,6 +43,13 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            val output = this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output?.outputFileName = "Hoshiya-v${defaultConfig.versionName}-${buildType.name}.apk"
         }
     }
 }
