@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Hoshiya</string>
+    <string name="tagline">星夜 • Lofi Anime Focus &amp; Pomodoro</string>
+    <string name="channel_name">Hoshiya Timer</string>
+    <string name="channel_description">Active Pomodoro timer status and notifications</string>
+    <string name="timer_work">Focus Time</string>
+    <string name="timer_short_break">Short Break</string>
+    <string name="timer_long_break">Long Break</string>
+</resources>

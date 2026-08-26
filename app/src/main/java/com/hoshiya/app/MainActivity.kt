@@ -1,0 +1,61 @@
+package com.hoshiya.app
+
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hoshiya.app.core.model.TimerState
+import com.hoshiya.app.core.theme.HoshiyaTheme
+import com.hoshiya.app.ui.navigation.HoshiyaNavHost
+import com.hoshiya.app.ui.timer.TimerViewModel
+
+class MainActivity : ComponentActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Notification permission handled
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        requestNotificationPermission()
+
+        setContent {
+            HoshiyaTheme {
+                val timerViewModel: TimerViewModel = viewModel()
+
+                // Keep screen on when timer is running if enabled in settings
+                val uiState = timerViewModel.uiState.value
+                if (uiState.settings.keepScreenOn && uiState.timerState == TimerState.RUNNING) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+
+                HoshiyaNavHost(timerViewModel = timerViewModel)
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+}

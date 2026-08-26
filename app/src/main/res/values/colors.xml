@@ -1,0 +1,7 @@
+<resources>
+    <color name="hoshiya_background">#0D0F18</color>
+    <color name="hoshiya_surface">#161A29</color>
+    <color name="hoshiya_primary">#7C83FD</color>
+    <color name="hoshiya_secondary">#F3A6C8</color>
+    <color name="hoshiya_star">#FDE49E</color>
+</resources>
