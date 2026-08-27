@@ -2,6 +2,7 @@ package com.saymaven.hoshiya.ui.timer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -109,63 +110,66 @@ fun TimerScreen(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Ambient Sound Button
-                    IconButton(
-                        onClick = { showAmbientSheet = true },
+                    Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
                             .background(
-                                if (uiState.isAmbientPlaying) TwilightViolet.copy(alpha = 0.2f)
-                                else SurfaceDarkElevated.copy(alpha = 0.5f)
+                                if (uiState.isAmbientPlaying) TwilightViolet.copy(alpha = 0.25f)
+                                else SurfaceDarkElevated.copy(alpha = 0.6f)
                             )
                             .border(
                                 1.dp,
-                                if (uiState.isAmbientPlaying) TwilightViolet.copy(alpha = 0.5f) else SurfaceBorder,
+                                if (uiState.isAmbientPlaying) TwilightViolet.copy(alpha = 0.6f) else SurfaceBorder,
                                 CircleShape
                             )
+                            .clickable(onClick = { showAmbientSheet = true }),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (uiState.isAmbientPlaying) Icons.Filled.GraphicEq else Icons.Outlined.GraphicEq,
                             contentDescription = "Ambient Sounds",
                             tint = if (uiState.isAmbientPlaying) TwilightViolet else TextSecondary,
-                            modifier = Modifier.size(19.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
 
                     // Stats Button
-                    IconButton(
-                        onClick = onNavigateToStats,
+                    Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
-                            .background(SurfaceDarkElevated.copy(alpha = 0.5f))
+                            .background(SurfaceDarkElevated.copy(alpha = 0.6f))
                             .border(1.dp, SurfaceBorder, CircleShape)
+                            .clickable(onClick = onNavigateToStats),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.BarChart,
                             contentDescription = "Focus Records",
                             tint = TextSecondary,
-                            modifier = Modifier.size(19.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
 
                     // Settings Button
-                    IconButton(
-                        onClick = onNavigateToSettings,
+                    Box(
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
-                            .background(SurfaceDarkElevated.copy(alpha = 0.5f))
+                            .background(SurfaceDarkElevated.copy(alpha = 0.6f))
                             .border(1.dp, SurfaceBorder, CircleShape)
+                            .clickable(onClick = onNavigateToSettings),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = "Settings",
                             tint = TextSecondary,
-                            modifier = Modifier.size(19.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                     }
                 }

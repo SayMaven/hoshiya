@@ -21,7 +21,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircleOutline
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.MilitaryTech
+import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Whatshot
 import androidx.compose.material3.Icon
@@ -37,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,13 +66,14 @@ fun StatsScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(SpaceBlack)
     ) {
-        StarfieldBackground(accentColor = TwilightViolet)
+        StarfieldBackground(accentColor = primaryColor)
 
         Column(
             modifier = Modifier
@@ -78,7 +82,7 @@ fun StatsScreen(
                 .navigationBarsPadding()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            // Header
+            // Top Header Bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -87,7 +91,7 @@ fun StatsScreen(
                 IconButton(
                     onClick = onNavigateBack,
                     modifier = Modifier
-                        .size(38.dp)
+                        .size(34.dp)
                         .clip(CircleShape)
                         .background(SurfaceDarkElevated.copy(alpha = 0.6f))
                         .border(1.dp, SurfaceBorder, CircleShape)
@@ -96,7 +100,7 @@ fun StatsScreen(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back",
                         tint = TextPrimary,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(17.dp)
                     )
                 }
 
@@ -113,25 +117,25 @@ fun StatsScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(38.dp))
+                Spacer(modifier = Modifier.size(34.dp))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Rank Card
+                // Focus Rank Card
                 item {
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
-                        color = SurfaceDarkElevated.copy(alpha = 0.85f),
+                        shape = RoundedCornerShape(18.dp),
+                        color = SurfaceDarkElevated.copy(alpha = 0.8f),
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
                             Brush.horizontalGradient(
                                 listOf(
-                                    TwilightViolet.copy(alpha = 0.4f),
+                                    primaryColor.copy(alpha = 0.4f),
                                     StarlightAmber.copy(alpha = 0.3f),
                                     SurfaceBorder
                                 )
@@ -140,22 +144,32 @@ fun StatsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
-                            modifier = Modifier.padding(18.dp),
+                            modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(14.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.MilitaryTech,
-                                contentDescription = null,
-                                tint = StarlightAmber,
-                                modifier = Modifier.size(32.dp)
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(CircleShape)
+                                    .background(StarlightAmber.copy(alpha = 0.15f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.MilitaryTech,
+                                    contentDescription = null,
+                                    tint = StarlightAmber,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+
                             Column {
                                 Text(
                                     text = "CURRENT FOCUS RANK",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = StarlightAmber,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 0.6.sp
                                 )
                                 Text(
                                     text = uiState.focusRank,
@@ -168,132 +182,60 @@ fun StatsScreen(
                     }
                 }
 
-                // Summary Numbers Grid (Streak, Total Hours, Sessions)
+                // 3 Metrics Overview Cards
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         // Streak
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(16.dp),
-                            color = SurfaceDarkElevated.copy(alpha = 0.7f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Whatshot,
-                                    contentDescription = null,
-                                    tint = StarlightAmber,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "${uiState.currentStreak} Days",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Streak",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = TextSecondary
-                                )
-                            }
-                        }
+                        MetricCard(
+                            icon = Icons.Outlined.Whatshot,
+                            iconTint = StarlightAmber,
+                            value = "${uiState.currentStreak}d",
+                            label = "Streak",
+                            modifier = Modifier.weight(1f)
+                        )
 
                         // Total Hours
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(16.dp),
-                            color = SurfaceDarkElevated.copy(alpha = 0.7f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Schedule,
-                                    contentDescription = null,
-                                    tint = TwilightViolet,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = String.format(Locale.getDefault(), "%.1fh", uiState.totalHours),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Total Focus",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = TextSecondary
-                                )
-                            }
-                        }
+                        MetricCard(
+                            icon = Icons.Outlined.Schedule,
+                            iconTint = primaryColor,
+                            value = String.format(Locale.getDefault(), "%.1fh", uiState.totalHours),
+                            label = "Total Focus",
+                            modifier = Modifier.weight(1f)
+                        )
 
-                        // Sessions
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(16.dp),
-                            color = SurfaceDarkElevated.copy(alpha = 0.7f),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.CheckCircleOutline,
-                                    contentDescription = null,
-                                    tint = SakuraPink,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "${uiState.totalSessions}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = TextPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Sessions",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = TextSecondary
-                                )
-                            }
-                        }
+                        // Total Completed Sessions
+                        MetricCard(
+                            icon = Icons.Outlined.CheckCircleOutline,
+                            iconTint = SakuraPink,
+                            value = "${uiState.totalSessions}",
+                            label = "Sessions",
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
 
-                // Category Breakdown
+                // Category Distribution Section
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    SectionHeader(title = "CATEGORY DISTRIBUTION", icon = Icons.Outlined.PieChart)
+                }
+
                 item {
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(16.dp),
                         color = SurfaceDarkElevated.copy(alpha = 0.7f),
                         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Category Distribution",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-
                             if (uiState.categoryBreakdown.isEmpty()) {
                                 Text(
-                                    text = "No focus sessions recorded yet. Start a timer to begin logging sessions.",
+                                    text = "No focus records yet. Complete a session to see your breakdown.",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary
+                                    color = TextMuted
                                 )
                             } else {
                                 val totalMins = uiState.categoryBreakdown.values.sum().coerceAtLeast(1)
@@ -312,7 +254,7 @@ fun StatsScreen(
                                                 Icon(
                                                     imageVector = getCategoryIcon(cat),
                                                     contentDescription = null,
-                                                    tint = TwilightViolet,
+                                                    tint = primaryColor,
                                                     modifier = Modifier.size(15.dp)
                                                 )
                                                 Text(
@@ -327,14 +269,14 @@ fun StatsScreen(
                                                 color = TextSecondary
                                             )
                                         }
-                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Spacer(modifier = Modifier.height(6.dp))
                                         LinearProgressIndicator(
                                             progress = { progress },
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(6.dp)
                                                 .clip(RoundedCornerShape(3.dp)),
-                                            color = TwilightViolet,
+                                            color = primaryColor,
                                             trackColor = SurfaceBorder,
                                             strokeCap = StrokeCap.Round
                                         )
@@ -347,35 +289,43 @@ fun StatsScreen(
 
                 // Recent Session History
                 item {
-                    Text(
-                        text = "Recent Sessions",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 6.dp)
-                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    SectionHeader(title = "RECENT ACTIVITY", icon = Icons.Outlined.History)
                 }
 
                 if (uiState.sessionsHistory.isEmpty()) {
                     item {
-                        Text(
-                            text = "No recent sessions logged yet.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextMuted
-                        )
-                    }
-                } else {
-                    items(uiState.sessionsHistory.take(15)) { session ->
-                        val dateFormatted = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
-                            .format(Date(session.timestamp))
                         Surface(
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(16.dp),
                             color = SurfaceDarkElevated.copy(alpha = 0.5f),
                             border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder),
                             modifier = Modifier.fillMaxWidth()
                         ) {
+                            Box(
+                                modifier = Modifier.padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "No recent sessions logged yet.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextMuted
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    items(uiState.sessionsHistory.take(20)) { session ->
+                        val dateFormatted = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
+                            .format(Date(session.timestamp))
+
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = SurfaceDarkElevated.copy(alpha = 0.6f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
@@ -383,16 +333,25 @@ fun StatsScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = getCategoryIcon(session.category),
-                                        contentDescription = null,
-                                        tint = TwilightViolet,
-                                        modifier = Modifier.size(16.dp)
-                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(primaryColor.copy(alpha = 0.12f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = getCategoryIcon(session.category),
+                                            contentDescription = null,
+                                            tint = primaryColor,
+                                            modifier = Modifier.size(15.dp)
+                                        )
+                                    }
+
                                     Column {
                                         Text(
-                                            text = "${session.category.title} • ${session.mode.title}",
-                                            style = MaterialTheme.typography.labelLarge,
+                                            text = "${session.category.title} \u2022 ${session.mode.title}",
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                                             color = TextPrimary
                                         )
                                         Text(
@@ -413,7 +372,77 @@ fun StatsScreen(
                         }
                     }
                 }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    icon: ImageVector
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(15.dp)
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp
+        )
+    }
+}
+
+@Composable
+private fun MetricCard(
+    icon: ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = SurfaceDarkElevated.copy(alpha = 0.7f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder)
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondary
+            )
         }
     }
 }

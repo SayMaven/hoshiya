@@ -1,7 +1,10 @@
 package com.saymaven.hoshiya.ui.ambient
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.VolumeDown
 import androidx.compose.material.icons.automirrored.outlined.VolumeOff
 import androidx.compose.material.icons.automirrored.outlined.VolumeUp
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocalCafe
@@ -37,14 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saymaven.hoshiya.core.model.AmbientSound
-import com.saymaven.hoshiya.core.theme.SakuraPink
-import com.saymaven.hoshiya.core.theme.StarlightAmber
 import com.saymaven.hoshiya.core.theme.SurfaceBorder
 import com.saymaven.hoshiya.core.theme.SurfaceDarkElevated
-import com.saymaven.hoshiya.core.theme.TextMuted
 import com.saymaven.hoshiya.core.theme.TextPrimary
 import com.saymaven.hoshiya.core.theme.TextSecondary
-import com.saymaven.hoshiya.core.theme.TwilightViolet
 
 fun getAmbientIcon(sound: AmbientSound): ImageVector {
     return when (sound) {
@@ -65,11 +65,13 @@ fun AmbientBottomSheet(
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp, vertical = 20.dp)
+            .padding(horizontal = 20.dp, vertical = 18.dp)
     ) {
         // Header
         Row(
@@ -81,32 +83,35 @@ fun AmbientBottomSheet(
                 Text(
                     text = "Lofi Ambiance",
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextPrimary
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Procedural soundscapes for focus",
+                    text = "Calming soundscapes for deep focus",
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary
                 )
             }
 
-            IconButton(
-                onClick = onClose,
+            Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(30.dp)
                     .clip(CircleShape)
+                    .background(SurfaceDarkElevated.copy(alpha = 0.8f))
                     .border(1.dp, SurfaceBorder, CircleShape)
+                    .clickable(onClick = onClose),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Close,
                     contentDescription = "Close",
                     tint = TextSecondary,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(15.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Sound Cards List
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -115,71 +120,88 @@ fun AmbientBottomSheet(
                 Surface(
                     onClick = { onSelectSound(sound) },
                     shape = RoundedCornerShape(16.dp),
-                    color = if (isSelected) TwilightViolet.copy(alpha = 0.16f) else SurfaceDarkElevated,
+                    color = if (isSelected) primaryColor.copy(alpha = 0.12f) else SurfaceDarkElevated.copy(alpha = 0.7f),
                     border = androidx.compose.foundation.BorderStroke(
                         1.dp,
-                        if (isSelected) TwilightViolet else SurfaceBorder
+                        if (isSelected) primaryColor else SurfaceBorder
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(14.dp)
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
-                                imageVector = getAmbientIcon(sound),
-                                contentDescription = null,
-                                tint = if (isSelected) TwilightViolet else TextSecondary,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isSelected) primaryColor.copy(alpha = 0.2f)
+                                        else SurfaceDarkElevated
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = getAmbientIcon(sound),
+                                    contentDescription = null,
+                                    tint = if (isSelected) primaryColor else TextSecondary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
                             Column {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Text(
-                                        text = sound.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = if (isSelected) TwilightViolet else TextPrimary,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                    Text(
-                                        text = "(${sound.japaneseTitle})",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = if (isSelected) SakuraPink else TextMuted
-                                    )
-                                }
+                                Text(
+                                    text = sound.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = if (isSelected) primaryColor else TextPrimary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
                                 Text(
                                     text = sound.description,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary
+                                    color = TextSecondary,
+                                    fontSize = 12.sp
                                 )
                             }
                         }
 
                         if (isSelected) {
-                            Text(
-                                text = "ACTIVE",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = StarlightAmber,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(primaryColor),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Check,
+                                    contentDescription = "Active",
+                                    tint = androidx.compose.ui.graphics.Color.Black,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Volume Control Slider
-        if (currentSound != AmbientSound.OFF) {
-            Column {
+        // Volume Control Slider (Only active if not mute)
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = SurfaceDarkElevated.copy(alpha = 0.7f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceBorder),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -187,24 +209,28 @@ fun AmbientBottomSheet(
                 ) {
                     Text(
                         text = "Ambiance Volume",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = TextSecondary
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = "${(volume * 100).toInt()}%",
                         style = MaterialTheme.typography.labelMedium,
-                        color = TwilightViolet,
+                        color = primaryColor,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.VolumeDown,
-                        contentDescription = null,
+                        contentDescription = "Min Volume",
                         tint = TextSecondary,
                         modifier = Modifier.size(18.dp)
                     )
@@ -215,15 +241,15 @@ fun AmbientBottomSheet(
                         valueRange = 0f..1f,
                         modifier = Modifier.weight(1f),
                         colors = SliderDefaults.colors(
-                            thumbColor = TwilightViolet,
-                            activeTrackColor = TwilightViolet,
+                            thumbColor = primaryColor,
+                            activeTrackColor = primaryColor,
                             inactiveTrackColor = SurfaceBorder
                         )
                     )
 
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
-                        contentDescription = null,
+                        contentDescription = "Max Volume",
                         tint = TextSecondary,
                         modifier = Modifier.size(18.dp)
                     )

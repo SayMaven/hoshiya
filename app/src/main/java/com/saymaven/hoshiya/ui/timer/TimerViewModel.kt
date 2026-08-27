@@ -20,11 +20,9 @@ import com.saymaven.hoshiya.core.model.TimerMode
 import com.saymaven.hoshiya.core.model.TimerState
 import com.saymaven.hoshiya.core.service.TimerService
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class TimerUiState(
@@ -45,7 +43,7 @@ data class TimerUiState(
 class TimerViewModel(application: Application) : AndroidViewModel(application) {
 
     private val preferences = HoshiyaPreferences(application)
-    private val ambientEngine = AmbientEngine()
+    private val ambientEngine = AmbientEngine(application.applicationContext)
 
     private var timerService: TimerService? = null
     private var isBound = false
@@ -108,15 +106,15 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             combine(
                 service.remainingSeconds,
-                service.totalDurationSeconds,
+                service.timerState,
                 service.currentMode,
-                service.timerState
-            ) { remaining, total, mode, state ->
+                service.totalDurationSeconds
+            ) { remaining, state, mode, totalDuration ->
                 _uiState.value = _uiState.value.copy(
                     remainingSeconds = remaining,
-                    totalDurationSeconds = total,
+                    timerState = state,
                     currentMode = mode,
-                    timerState = state
+                    totalDurationSeconds = totalDuration
                 )
             }.collect {}
         }
@@ -137,14 +135,9 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onPlayPauseClick() {
-        SoundSynthesizer.playClickSound()
         when (_uiState.value.timerState) {
             TimerState.RUNNING -> {
                 timerService?.pauseTimer()
-                if (ambientEngine.isPlaying()) {
-                    ambientEngine.stop()
-                    _uiState.value = _uiState.value.copy(isAmbientPlaying = false)
-                }
             }
             TimerState.PAUSED -> {
                 timerService?.resumeTimer()
@@ -160,7 +153,6 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onResetClick() {
-        SoundSynthesizer.playClickSound()
         timerService?.resetTimer()
         val duration = getDurationForMode(_uiState.value.currentMode, _uiState.value.settings)
         _uiState.value = _uiState.value.copy(
@@ -168,24 +160,17 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
             totalDurationSeconds = duration,
             timerState = TimerState.IDLE
         )
-        if (ambientEngine.isPlaying()) {
-            ambientEngine.stop()
-            _uiState.value = _uiState.value.copy(isAmbientPlaying = false)
-        }
     }
 
     fun onSkipClick() {
-        SoundSynthesizer.playClickSound()
         advanceToNextMode()
     }
 
     fun onAdd5Minutes() {
-        SoundSynthesizer.playClickSound()
         timerService?.addMinutes(5)
     }
 
     fun setMode(mode: TimerMode) {
-        SoundSynthesizer.playClickSound()
         timerService?.resetTimer()
         val duration = getDurationForMode(mode, _uiState.value.settings)
         _uiState.value = _uiState.value.copy(
@@ -204,7 +189,6 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refreshQuote() {
-        SoundSynthesizer.playClickSound()
         _uiState.value = _uiState.value.copy(currentQuote = AnimeQuote.randomQuote())
     }
 
@@ -214,14 +198,12 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
             preferences.updateSettings(newSettings)
         }
         _uiState.value = _uiState.value.copy(activeAmbientSound = sound)
-        if (_uiState.value.timerState == TimerState.RUNNING) {
-            if (sound == AmbientSound.OFF) {
-                ambientEngine.stop()
-                _uiState.value = _uiState.value.copy(isAmbientPlaying = false)
-            } else {
-                ambientEngine.play(sound, _uiState.value.ambientVolume)
-                _uiState.value = _uiState.value.copy(isAmbientPlaying = true)
-            }
+        if (sound == AmbientSound.OFF) {
+            ambientEngine.stop()
+            _uiState.value = _uiState.value.copy(isAmbientPlaying = false)
+        } else {
+            ambientEngine.play(sound, _uiState.value.ambientVolume)
+            _uiState.value = _uiState.value.copy(isAmbientPlaying = true)
         }
     }
 
@@ -296,9 +278,6 @@ class TimerViewModel(application: Application) : AndroidViewModel(application) {
         if (shouldAutoStart) {
             timerService?.startTimer()
             startAmbientIfEnabled()
-        } else {
-            ambientEngine.stop()
-            _uiState.value = _uiState.value.copy(isAmbientPlaying = false)
         }
     }
 

@@ -12,5 +12,7 @@ data class PomodoroSettings(
     val keepScreenOn: Boolean = true,
     val animeQuotesEnabled: Boolean = true,
     val ambientSound: AmbientSound = AmbientSound.STARRY_NIGHT,
-    val ambientVolume: Float = 0.5f
+    val ambientVolume: Float = 0.5f,
+    val themePalette: AppThemePalette = AppThemePalette.CELESTIAL,
+    val useDynamicColor: Boolean = false
 )

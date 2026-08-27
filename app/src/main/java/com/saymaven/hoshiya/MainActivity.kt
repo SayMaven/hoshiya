@@ -10,7 +10,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
 import com.saymaven.hoshiya.core.model.TimerState
 import com.saymaven.hoshiya.core.theme.HoshiyaTheme
 import com.saymaven.hoshiya.ui.navigation.HoshiyaNavHost
@@ -31,11 +33,14 @@ class MainActivity : ComponentActivity() {
         requestNotificationPermission()
 
         setContent {
-            HoshiyaTheme {
-                val timerViewModel: TimerViewModel = viewModel()
+            val timerViewModel: TimerViewModel = viewModel()
+            val uiState by timerViewModel.uiState.collectAsStateWithLifecycle()
 
+            HoshiyaTheme(
+                palette = uiState.settings.themePalette,
+                dynamicColor = uiState.settings.useDynamicColor
+            ) {
                 // Keep screen on when timer is running if enabled in settings
-                val uiState = timerViewModel.uiState.value
                 if (uiState.settings.keepScreenOn && uiState.timerState == TimerState.RUNNING) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 } else {

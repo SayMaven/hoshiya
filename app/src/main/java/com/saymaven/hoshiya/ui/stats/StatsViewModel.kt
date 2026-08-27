@@ -24,11 +24,11 @@ data class StatsUiState(
 
     val focusRank: String
         get() = when {
-            totalHours < 2f -> "Novice (見習い昁E"
-            totalHours < 10f -> "Nebula Scholar (星雲の学老E"
-            totalHours < 30f -> "Constellation Knight (星座の騎士)"
-            totalHours < 80f -> "Astral Sage (星界の賢老E"
-            else -> "Cosmic Master (星王)"
+            totalHours < 2f -> "Novice Focus"
+            totalHours < 10f -> "Dedicated Scholar"
+            totalHours < 30f -> "Deep Worker"
+            totalHours < 80f -> "Flow Master"
+            else -> "Cosmic Sage"
         }
 }
 

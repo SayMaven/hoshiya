@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.saymaven.hoshiya.core.model.AmbientSound
+import com.saymaven.hoshiya.core.model.AppThemePalette
 import com.saymaven.hoshiya.core.model.FocusCategory
 import com.saymaven.hoshiya.core.model.PomodoroSettings
 import com.saymaven.hoshiya.core.model.SessionRecord
@@ -38,6 +39,8 @@ class HoshiyaPreferences(private val context: Context) {
         private val KEY_ANIME_QUOTES = booleanPreferencesKey("anime_quotes")
         private val KEY_AMBIENT_SOUND = stringPreferencesKey("ambient_sound")
         private val KEY_AMBIENT_VOLUME = floatPreferencesKey("ambient_volume")
+        private val KEY_THEME_PALETTE = stringPreferencesKey("theme_palette")
+        private val KEY_DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
 
         private val KEY_TOTAL_FOCUS_SECONDS = longPreferencesKey("total_focus_seconds")
         private val KEY_TOTAL_SESSIONS = intPreferencesKey("total_sessions")
@@ -60,7 +63,9 @@ class HoshiyaPreferences(private val context: Context) {
             keepScreenOn = prefs[KEY_KEEP_SCREEN_ON] ?: true,
             animeQuotesEnabled = prefs[KEY_ANIME_QUOTES] ?: true,
             ambientSound = AmbientSound.fromName(prefs[KEY_AMBIENT_SOUND]),
-            ambientVolume = prefs[KEY_AMBIENT_VOLUME] ?: 0.5f
+            ambientVolume = prefs[KEY_AMBIENT_VOLUME] ?: 0.5f,
+            themePalette = AppThemePalette.fromName(prefs[KEY_THEME_PALETTE]),
+            useDynamicColor = prefs[KEY_DYNAMIC_COLOR] ?: false
         )
     }
 
@@ -99,6 +104,8 @@ class HoshiyaPreferences(private val context: Context) {
             prefs[KEY_ANIME_QUOTES] = settings.animeQuotesEnabled
             prefs[KEY_AMBIENT_SOUND] = settings.ambientSound.name
             prefs[KEY_AMBIENT_VOLUME] = settings.ambientVolume
+            prefs[KEY_THEME_PALETTE] = settings.themePalette.name
+            prefs[KEY_DYNAMIC_COLOR] = settings.useDynamicColor
         }
     }
 
@@ -117,7 +124,6 @@ class HoshiyaPreferences(private val context: Context) {
                 val currentCount = prefs[KEY_TOTAL_SESSIONS] ?: 0
                 prefs[KEY_TOTAL_SESSIONS] = currentCount + 1
 
-                // Streak logic
                 val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 val lastDate = prefs[KEY_LAST_ACTIVE_DATE] ?: ""
                 val currentStreak = prefs[KEY_CURRENT_STREAK] ?: 0
@@ -127,8 +133,6 @@ class HoshiyaPreferences(private val context: Context) {
                         .format(Date(System.currentTimeMillis() - 86400000L))
                     if (lastDate == yesterdayStr) {
                         prefs[KEY_CURRENT_STREAK] = currentStreak + 1
-                    } else if (lastDate.isEmpty()) {
-                        prefs[KEY_CURRENT_STREAK] = 1
                     } else {
                         prefs[KEY_CURRENT_STREAK] = 1
                     }
@@ -136,11 +140,9 @@ class HoshiyaPreferences(private val context: Context) {
                 }
             }
 
-            // Append history
             val existing = prefs[KEY_SESSION_HISTORY] ?: ""
             val encoded = "${record.id},${record.timestamp},${record.durationSeconds},${record.mode.name},${record.category.name},${record.completed}"
             val updated = if (existing.isEmpty()) encoded else "$encoded;$existing"
-            // Keep last 100 entries to prevent growth
             val trimmed = updated.split(";").take(100).joinToString(";")
             prefs[KEY_SESSION_HISTORY] = trimmed
         }
